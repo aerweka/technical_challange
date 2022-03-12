@@ -1,10 +1,10 @@
-const Invoice = require("../models/Invoice"),
+const Invoices = require("../models/Invoices"),
   { db } = require("../connection/db_mysql"),
   { Op } = require("sequelize");
 
 const index = async (req, res) => {
   try {
-    const allInvoices = await Invoice.findAll({});
+    const allInvoices = await Invoices.findAll({});
     res.json(allInvoices);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -14,9 +14,9 @@ const index = async (req, res) => {
 const show = async (req, res) => {
   const { date, size, page } = req.params;
   try {
-    const invoice = await Invoice.findAll({
+    const invoice = await Invoices.findAll({
       attribute: {
-        include: [[db.fn("COUNT", db.col("payment_type"), "cash")]],
+        include: [[db.fn("COUNT", db.col("paymentType"), "cash")]],
       },
       where: {
         date: date,
@@ -31,52 +31,46 @@ const show = async (req, res) => {
 };
 
 const store = async (req, res) => {
-  const {
-    invoice_no,
-    date,
-    customer_name,
-    salesperson_name,
-    payment_type,
-    notes,
-  } = req.body;
+  const { invoiceNo, date, customerName, salespersonName, paymentType, notes } =
+    req.body;
 
   try {
-    const newInvoice = await Invoice.create({
-      invoice_no,
+    const newInvoice = await Invoices.create({
+      invoiceNo,
       date,
-      customer_name,
-      salesperson_name,
-      payment_type,
+      customerName,
+      salespersonName,
+      paymentType,
       notes,
     });
 
     res.json(newInvoice);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    const error = errorHandle(err);
+    res.status(500).json({ message: err.message });
   }
 };
 
 const update = async (req, res) => {
-  const { date, customer_name, salesperson_name, payment_type, notes } =
-    req.body;
-  const { invoice_no } = req.params;
+  const { date, customerName, salespersonName, paymentType, notes } = req.body;
+  const { invoiceNo } = req.params;
   try {
-    const updateInvoice = await Invoice.update(
+    const updateInvoice = await Invoices.update(
       {
         date: date,
-        customer_name: customer_name,
-        salesperson_name: salesperson_name,
-        payment_type: payment_type,
+        customerName: customerName,
+        salespersonName: salespersonName,
+        paymentType: paymentType,
         notes: notes,
       },
       {
         where: {
-          invoice_no: invoice_no,
+          invoiceNo: invoiceNo,
         },
       }
     );
 
-    await updateInvoice;
+    await updateInvoices;
 
     res.json({ message: "Update success" });
   } catch (error) {
@@ -85,16 +79,33 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  const { invoice_no } = req.params;
+  const { invoiceNo } = req.params;
 
   try {
-    const deletedInvoice = await Invoice.destroy({
-      where: { invoice_no },
+    const deletedInvoices = await Invoices.destroy({
+      where: { invoiceNo },
     });
-    res.json({ message: "Invoice deleted" });
+    res.json({ message: "Invoices deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+const errorHandle = (err) => {
+  console.log(err);
+  let errors = {
+    invoiceNo: "",
+    date: "",
+    customerName: "",
+    salespersonName: "",
+    paymentType: "",
+    notes: "",
+  };
+
+  Object.values(err.errors).forEach(({ ValidationErrorItem }) => {
+    console.log(ValidationErrorItem);
+    // errors[ValidationErrorItem.path] = ValidationErrorItem.message;
+  });
 };
 
 module.exports = { index, show, store, update, remove };

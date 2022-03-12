@@ -1,8 +1,9 @@
 const { db } = require("../connection/db_mysql"),
   { DataTypes } = require("sequelize");
+const Invoices = require("./Invoices");
 
 const Products = db.define("product", {
-  item_name: {
+  itemName: {
     type: DataTypes.TEXT,
     allowNull: false,
     validate: {
@@ -18,7 +19,7 @@ const Products = db.define("product", {
       },
     },
   },
-  total_cost_of_good_sold: {
+  totalCostOfGoodSold: {
     type: DataTypes.NUMBER,
     allowNull: false,
     validate: {
@@ -27,7 +28,7 @@ const Products = db.define("product", {
       },
     },
   },
-  total_price_sold: {
+  totalPriceSold: {
     type: DataTypes.NUMBER,
     allowNull: false,
     validate: {
@@ -37,3 +38,8 @@ const Products = db.define("product", {
     },
   },
 });
+
+// Products.belongsToMany(Invoices, { through: "ListsProductsOfInvoice" });
+Products.sync({ force: true });
+
+module.exports = Products;

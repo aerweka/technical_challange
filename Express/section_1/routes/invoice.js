@@ -9,7 +9,7 @@ const router = require("express").Router(),
 
 router.get("/", index);
 
-router.get("/:date", show);
+router.get("/:date?/:size?/:page?", show);
 
 router.post("/", store);
 

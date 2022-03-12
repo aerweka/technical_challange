@@ -1,8 +1,9 @@
 const { db } = require("../connection/db_mysql"),
+  Products = require("./Products"),
   { DataTypes } = require("sequelize");
 
-const Invoice = db.define("invoice", {
-  invoice_no: {
+const Invoices = db.define("invoice", {
+  invoiceNo: {
     type: DataTypes.TEXT,
     allowNull: false,
     validate: {
@@ -18,21 +19,21 @@ const Invoice = db.define("invoice", {
       isDate: true,
     },
   },
-  customer_name: {
+  customerName: {
     type: DataTypes.TEXT,
     allowNull: false,
     validate: {
       min: 2,
     },
   },
-  salesperson_name: {
+  salespersonName: {
     type: DataTypes.TEXT,
     allowNull: false,
     validate: {
       min: 2,
     },
   },
-  payment_type: {
+  paymentType: {
     type: DataTypes.ENUM({
       values: ["CASH", "CREDIT"],
     }),
@@ -46,8 +47,11 @@ const Invoice = db.define("invoice", {
       min: 5,
     },
   },
+  // list_of_products_sold: {},
 });
 
-// Invoice.sync({ alter: true });
+Invoices.belongsToMany(Products, { through: "ListsProductsOfInvoice" });
 
-module.exports = Invoice;
+// Invoices.sync({ force: true });
+
+module.exports = Invoices;
