@@ -15,9 +15,6 @@ const show = async (req, res) => {
   const { date, size, page } = req.params;
   try {
     const invoice = await Invoices.findAll({
-      attribute: {
-        include: [[db.fn("COUNT", db.col("paymentType"), "cash")]],
-      },
       where: {
         date: date,
       },
@@ -46,7 +43,7 @@ const store = async (req, res) => {
 
     res.json(newInvoice);
   } catch (err) {
-    const error = errorHandle(err);
+    // const error = errorHandle(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -92,7 +89,9 @@ const remove = async (req, res) => {
 };
 
 const errorHandle = (err) => {
-  console.log(err);
+  err.errors.forEach(({ ValidationErrorItem }) => {
+    // console.log(ValidationErrorItem.message);
+  });
   let errors = {
     invoiceNo: "",
     date: "",
@@ -103,7 +102,7 @@ const errorHandle = (err) => {
   };
 
   Object.values(err.errors).forEach(({ ValidationErrorItem }) => {
-    console.log(ValidationErrorItem);
+    // console.log(ValidationErrorItem);
     // errors[ValidationErrorItem.path] = ValidationErrorItem.message;
   });
 };

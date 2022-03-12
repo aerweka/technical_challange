@@ -16,7 +16,10 @@ const Invoices = db.define("invoice", {
     type: DataTypes.DATE,
     allowNull: false,
     validate: {
-      isDate: true,
+      isDate: {
+        args: true,
+        msg: "Please insert valid date",
+      },
     },
   },
   customerName: {
@@ -24,13 +27,26 @@ const Invoices = db.define("invoice", {
     allowNull: false,
     validate: {
       min: 2,
+      // {
+      //   args: 2,
+      //   msg: "Must have minmimum 2 character",
+      // },
+      isLengthCorrect(value) {
+        if (value.length < 2) throw new Error("Must have minmimum 2 character");
+      },
     },
   },
   salespersonName: {
     type: DataTypes.TEXT,
     allowNull: false,
     validate: {
-      min: 2,
+      // min: {
+      //   args: 2,
+      //   msg: "Must have minmimum 2 character",
+      // },
+      isLengthCorrect(value) {
+        if (value.length < 2) throw new Error("Must have minmimum 2 character");
+      },
     },
   },
   paymentType: {
@@ -38,13 +54,19 @@ const Invoices = db.define("invoice", {
       values: ["CASH", "CREDIT"],
     }),
     validate: {
-      isIn: [["CASH", "CREDIT"]],
+      isIn: {
+        args: [["CASH", "CREDIT"]],
+        msg: "Choose Cash or Credit",
+      },
     },
   },
   notes: {
     type: DataTypes.TEXT,
     validate: {
-      min: 5,
+      min: {
+        args: 5,
+        msg: "Must have minmimum 5 character",
+      },
     },
   },
   // list_of_products_sold: {},
